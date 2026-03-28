@@ -1,6 +1,6 @@
 # Duplicate Image Finder
 
-A local, browser-based tool for finding and consolidating duplicate photos and videos on your Mac.
+A local, browser-based tool for finding and consolidating duplicate photos and videos. Works on macOS, Linux, and Windows.
 
 No cloud. No database. No tracking. Everything runs on localhost.
 
@@ -25,7 +25,14 @@ That's it. The script sets up a Python virtual environment, installs dependencie
 - ffmpeg (optional, for video thumbnails)
 
 ```bash
+# macOS
 brew install ffmpeg
+
+# Ubuntu/Debian
+sudo apt install ffmpeg
+
+# Windows
+winget install ffmpeg
 ```
 
 ---
@@ -50,7 +57,8 @@ brew install ffmpeg
 - **Safe moves** — files are moved to a trash folder, never deleted. Original timestamps (creation/modification dates) are preserved
 - **Memory efficient** — files are hashed in 8MB chunks, never fully loaded into memory
 - **Non-blocking** — scans run in a background thread, large folders won't freeze the app
-- **Show in Finder** — reveal any file's location with one click
+- **Reveal file** — open any file's location in Finder, Explorer, or your file manager with one click
+- **Cross-platform** — works on macOS, Linux, and Windows
 
 ## Supported Formats
 
@@ -72,7 +80,7 @@ POST /scan/{id}/stop             Cancel a running scan
 GET  /scan/{id}/results          Retrieve duplicate groups
 GET  /thumbnail/{id}?path=...    Image/video thumbnails
 POST /consolidate                Move duplicate files
-POST /reveal                     Open file in Finder
+POST /reveal                     Open file in file manager
 ```
 
 ## Manual Setup

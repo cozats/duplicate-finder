@@ -39,7 +39,11 @@ echo "Starting frontend on http://localhost:5173 ..."
 FRONTEND_PID=$!
 
 sleep 2
-open "http://localhost:5173"
+case "$(uname -s)" in
+  Darwin)  open "http://localhost:5173" ;;
+  Linux)   xdg-open "http://localhost:5173" 2>/dev/null ;;
+  MINGW*|MSYS*|CYGWIN*)  start "http://localhost:5173" ;;
+esac
 
 echo ""
 echo "Duplicate Finder is running. Press Ctrl+C to stop."

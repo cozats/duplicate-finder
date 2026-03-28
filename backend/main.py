@@ -1,5 +1,6 @@
 import io
 import os
+import platform
 import subprocess
 import uuid
 from pathlib import Path
@@ -162,7 +163,14 @@ def _video_thumbnail(filepath: str) -> Response:
 @app.post("/reveal")
 def reveal_file(req: RevealRequest):
     try:
-        subprocess.run(["open", "-R", req.path], check=True, timeout=5)
+        system = platform.system()
+        if system == "Darwin":
+            subprocess.run(["open", "-R", req.path], check=True, timeout=5)
+        elif system == "Windows":
+            subprocess.run(["explorer", "/select,", req.path], check=True, timeout=5)
+        else:
+            folder = str(Path(req.path).parent)
+            subprocess.run(["xdg-open", folder], check=True, timeout=5)
         return {"ok": True}
     except Exception as e:
         return {"ok": False, "error": str(e)}
