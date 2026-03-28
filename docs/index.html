@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duplicate Image Finder</title>
+  <meta name="description" content="A local, browser-based tool for finding and consolidating duplicate photos and videos on your Mac. No cloud. No database. Everything runs on localhost.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0a;
+      --surface: #131313;
+      --surface-2: #1a1a1a;
+      --border: #222;
+      --text: #e0e0e0;
+      --text-secondary: #888;
+      --text-muted: #555;
+      --accent: #a3d5c9;
+      --accent-dim: rgba(163, 213, 201, 0.1);
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'DM Sans', system-ui, sans-serif;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 120px 0 80px;
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .accent {
+      color: var(--accent);
+    }
+
+    .hero .subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 28px;
+      border-radius: 6px;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.15s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: var(--text);
+      color: var(--bg);
+    }
+    .btn-primary:hover { opacity: 0.85; }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--text-muted); color: var(--text); }
+
+    /* Badges */
+    .badges {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+    }
+
+    /* Quickstart */
+    .quickstart {
+      padding: 60px 0;
+    }
+
+    .code-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 28px;
+      text-align: center;
+    }
+
+    .code-block code {
+      font-family: var(--mono);
+      font-size: 1rem;
+      color: var(--accent);
+    }
+
+    .code-block .comment {
+      color: var(--text-muted);
+    }
+
+    /* Features */
+    .features {
+      padding: 40px 0 80px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px;
+    }
+
+    .feature-card h3 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* How it works */
+    .how-it-works {
+      padding: 40px 0 80px;
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 32px;
+      text-align: center;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .step {
+      display: flex;
+      gap: 16px;
+      align-items: baseline;
+      padding: 16px 20px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .step-num {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      flex-shrink: 0;
+      width: 24px;
+    }
+
+    .step p {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    /* Formats */
+    .formats {
+      padding: 40px 0 80px;
+    }
+
+    .format-row {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .format-group {
+      text-align: center;
+    }
+
+    .format-group h4 {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 10px;
+    }
+
+    .format-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .format-tag {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 4px 10px;
+      border-radius: 4px;
+    }
+
+    /* Footer */
+    .footer {
+      padding: 40px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+    }
+
+    .footer p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer a {
+      color: var(--text-secondary);
+      text-decoration: none;
+    }
+    .footer a:hover { color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .hero { padding: 80px 0 60px; }
+      .hero h1 { font-size: 2rem; }
+      .features-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <section class="hero">
+      <h1>Duplicate Image<br><span class="accent">Finder</span></h1>
+      <p class="subtitle">
+        Find and consolidate duplicate photos and videos on your Mac.
+        Local-only. Nothing leaves your machine.
+      </p>
+      <div class="hero-actions">
+        <a href="https://github.com/cozats/duplicate-finder" class="btn btn-primary">
+          View on GitHub
+        </a>
+        <a href="https://github.com/cozats/duplicate-finder#quick-start" class="btn btn-secondary">
+          Quick Start
+        </a>
+      </div>
+      <div class="badges">
+        <span class="badge">Python + FastAPI</span>
+        <span class="badge">React + Vite</span>
+        <span class="badge">SHA-256</span>
+        <span class="badge">macOS</span>
+      </div>
+    </section>
+
+    <section class="quickstart">
+      <div class="code-block">
+        <code>
+          <span class="comment">git clone https://github.com/cozats/duplicate-finder.git && cd duplicate-finder</span><br><br>
+          ./start.sh
+        </code>
+      </div>
+    </section>
+
+    <section class="features">
+      <h2 class="section-title">Features</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Full-Resolution Preview</h3>
+          <p>Click any thumbnail to view at full size. Use arrow keys to compare files side by side within a group.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Safe by Default</h3>
+          <p>Files are moved to a trash folder, never deleted. Original timestamps are preserved. Nothing is permanent.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Memory Efficient</h3>
+          <p>Files are hashed in 8MB chunks. Even multi-gigabyte video files never get fully loaded into memory.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Non-Blocking Scans</h3>
+          <p>Scans run in a background thread with real-time progress. Cancel anytime without side effects.</p>
+        </div>
+        <div class="feature-card">
+          <h3>Smart Defaults</h3>
+          <p>The oldest file in each group is auto-selected as the keeper. One-click auto-resolve for all groups.</p>
+        </div>
+        <div class="feature-card">
+          <h3>100% Local</h3>
+          <p>No cloud. No database. No tracking. Everything runs on localhost. Your files never leave your machine.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="how-it-works">
+      <h2 class="section-title">How It Works</h2>
+      <div class="steps">
+        <div class="step">
+          <span class="step-num">01</span>
+          <p>Enter one or more folder paths to scan</p>
+        </div>
+        <div class="step">
+          <span class="step-num">02</span>
+          <p>Every image and video is hashed with SHA-256</p>
+        </div>
+        <div class="step">
+          <span class="step-num">03</span>
+          <p>Files with identical hashes are grouped as duplicates</p>
+        </div>
+        <div class="step">
+          <span class="step-num">04</span>
+          <p>Pick a keeper for each group, or skip groups you want to leave alone</p>
+        </div>
+        <div class="step">
+          <span class="step-num">05</span>
+          <p>Consolidate moves duplicates to <code style="font-family: var(--mono); color: var(--accent);">_duplicates_trash/</code> for review</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="formats">
+      <h2 class="section-title">Supported Formats</h2>
+      <div class="format-row">
+        <div class="format-group">
+          <h4>Images</h4>
+          <div class="format-tags">
+            <span class="format-tag">.jpg</span>
+            <span class="format-tag">.jpeg</span>
+            <span class="format-tag">.png</span>
+            <span class="format-tag">.gif</span>
+            <span class="format-tag">.heic</span>
+            <span class="format-tag">.webp</span>
+          </div>
+        </div>
+        <div class="format-group">
+          <h4>Videos</h4>
+          <div class="format-tags">
+            <span class="format-tag">.mp4</span>
+            <span class="format-tag">.mov</span>
+            <span class="format-tag">.avi</span>
+            <span class="format-tag">.mkv</span>
+            <span class="format-tag">.m4v</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>MIT License &middot; <a href="https://github.com/cozats/duplicate-finder">GitHub</a></p>
+    </footer>
+
+  </div>
+
+</body>
+</html>
